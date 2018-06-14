@@ -1,0 +1,21 @@
+{
+  "name": "fortifi/integration-example",
+  "description": "Integrations Page Example",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Brooke Bryan",
+      "email": "brooke@bajb.net"
+    }
+  ],
+  "require": {
+    "fortifi/ui": "1.4.*",
+    "illuminate/contracts": "5.6.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "FortifiIntegration\\": "src/"
+    }
+  }
+}
