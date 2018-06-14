@@ -2,51 +2,58 @@
 namespace FortifiIntegration;
 
 use Fortifi\Ui\ContentElements\Links\PageletLink;
+use Fortifi\Ui\ContentElements\ObjectLists\ObjectList;
+use Fortifi\Ui\ContentElements\ObjectLists\ObjectListCard;
+use Fortifi\Ui\GlobalElements\Cards\Card;
+use Fortifi\Ui\GlobalElements\Cards\Cards;
 use Fortifi\Ui\GlobalElements\Panels\ContentPanel;
-use Packaged\Dispatch\AssetManager;
-use Packaged\Glimpse\Tags\Text\HeadingOne;
+use Fortifi\Ui\GlobalElements\Panels\PanelHeader;
 
-class Handler implements \JsonSerializable
+class Handler extends AbstractForifiHandler
 {
-  protected $_base;
-
-  public function __construct()
+  public function getNav()
   {
-    if(!isset($_GET['fortifiurl']))
-    {
-      throw new \Exception("Invalid Request");
-    }
-    $this->_base = urldecode($_GET['fortifiurl']);
-  }
-
-  public function jsonSerialize()
-  {
-    $additional = [];
-    $additional['pageTitle'] = 'Page Title';
-
-    return array_merge(
-      $additional,
-      [
-        'appGroup'  => '',
-        'markup'    => $this->getContent()->render(),
-        'resources' =>
-          [
-            'css' => AssetManager::getUrisByType(AssetManager::TYPE_CSS),
-            'js'  => AssetManager::getUrisByType(AssetManager::TYPE_JS),
-          ],
-      ]
+    $nav = ObjectList::i();
+    $nav->addCard(
+      ObjectListCard::i()->setTitle(
+        new PageletLink($this->getBaseUrl() . 'customer', 'Customers', '#integrate-section')
+      )
     );
+    $nav->addCard(
+      ObjectListCard::i()->setTitle(
+        new PageletLink($this->getBaseUrl() . 'domain', 'Domains', '#integrate-section')
+      )
+    );
+    return $nav;
   }
 
+  /**
+   * @return ContentPanel
+   * @throws \Exception
+   */
   public function getContent()
   {
-    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-    return ContentPanel::create(
+    $page = $this->_getRequest()->get('page', 1);
+    $pageType = trim($this->path(1), '/');
+
+    $cards = Cards::i();
+    $cardOne = Card::i();
+    $cardOne->setTitle("This Card");
+    $cards->addCard($cardOne);
+
+    $panel = ContentPanel::create(
       [
-        HeadingOne::create("Page #" . $page),
-        "Content Panel",
-        new PageletLink($this->_base . '?page=' . ($page + 1), 'Next Page ', '#integrate-section'),
+        "Page Navigation: ",
+        new PageletLink(
+          $this->getBaseUrl() . $pageType . '?page=' . ($page - 1), 'Previous Page ', '#integrate-section'
+        ),
+        ' | ',
+        new PageletLink($this->getBaseUrl() . $pageType . '?page=' . ($page), 'Reload Page ', '#integrate-section'),
+        ' | ',
+        new PageletLink($this->getBaseUrl() . $pageType . '?page=' . ($page + 1), 'Next Page ', '#integrate-section'),
       ]
     );
+    $panel->setHeader(PanelHeader::create(trim(ucwords($pageType) . " Page #" . $page)));
+    return [$panel, $cards];
   }
 }
