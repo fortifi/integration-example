@@ -2,33 +2,23 @@
 namespace FortifiIntegration;
 
 use Fortifi\Ui\ContentElements\Links\PageletLink;
-use Fortifi\Ui\ContentElements\ObjectLists\ObjectList;
-use Fortifi\Ui\ContentElements\ObjectLists\ObjectListCard;
 use Fortifi\Ui\GlobalElements\Cards\Card;
 use Fortifi\Ui\GlobalElements\Cards\Cards;
 use Fortifi\Ui\GlobalElements\Panels\ContentPanel;
 use Fortifi\Ui\GlobalElements\Panels\PanelHeader;
+use Fortifi\Ui\PageElements\PageNavigation\PageNavigation;
 
 class Handler extends AbstractForifiHandler
 {
   public function getNav()
   {
-    $nav = ObjectList::i();
-    $nav->addCard(
-      ObjectListCard::i()->setTitle(
-        new PageletLink($this->getBaseUrl() . 'customer', 'Customers', '#integrate-section')
-      )
-    );
-    $nav->addCard(
-      ObjectListCard::i()->setTitle(
-        new PageletLink($this->getBaseUrl() . 'domain', 'Domains', '#integrate-section')
-      )
-    );
+    $nav = PageNavigation::create($this->getBaseUrl());
+    $nav->addItem(new PageletLink($this->getBaseUrl() . 'customer', 'Customers', '#integrate-section'));
+    $nav->addItem(new PageletLink($this->getBaseUrl() . 'domain', 'Domains', '#integrate-section'));
     return $nav;
   }
 
   /**
-   * @return ContentPanel
    * @throws \Exception
    */
   public function getContent()
@@ -38,7 +28,11 @@ class Handler extends AbstractForifiHandler
 
     $cards = Cards::i();
     $cardOne = Card::i();
-    $cardOne->setTitle("This Card");
+    $cardOne->setTitle("This is an integration page card");
+    $cardOne->setLabel("Page Details");
+    $cardOne->setColour(Card::COLOUR_INDIGO);
+    $cardOne->addProperty("Page Type", $pageType);
+    $cardOne->addProperty("Page #", $page);
     $cards->addCard($cardOne);
 
     $panel = ContentPanel::create(
